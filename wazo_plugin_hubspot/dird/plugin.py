@@ -225,7 +225,7 @@ class HubspotBackend(BaseSourcePlugin):
         added with a `__unique_id` header containing the unique key.
         """
         intnum = phonenumbers.parse(term, None)
-        intnum = phonenumbers.format_number(intnum, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+        intnum = phonenumbers.format_number(intnum, phonenumbers.PhoneNumberFormat.E164)
 
         contact_public_object_search_request = PublicObjectSearchRequest(
             filter_groups=[
@@ -445,4 +445,13 @@ class HubspotBackend(BaseSourcePlugin):
            (self._source_result_from_content(company) for company in companies_res.results))
 
     def _source_result_from_content(self, content):
+        try:
+            for phone_property in [self.HUBSPOT_FIELD_PHONE, self.HUBSPOT_FIELD_MOBILE]:
+                if phone_property in content.properties and content.properties[phone_property]:
+                    parsed_phone = phonenumbers.parse(content.properties[phone_property], None)
+                    content.properties[phone_property] = phonenumbers.format_number(parsed_phone, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            
+        except phonenumbers.NumberParseException as e:
+            logger.warn("Exception when trying to parse phone number: %s\n" % e)
+
         return self._SourceResult(content.properties)

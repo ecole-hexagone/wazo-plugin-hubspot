@@ -11,7 +11,7 @@ Works only with **Wazo >= 20.11**
 
 ### Roadmap
 
-- [ ] CRM integration in dird (search, lookup, favorites)
+- [x] CRM integration in dird (search, lookup, favorites)
 
 May need to move from private app to marketplace app:
 
@@ -52,7 +52,7 @@ POST body:
         }
     }
 
-### CLI (not tested yet, but seems to miss a way to pass `ref` attribute )
+### CLI (not tested yet, but seems to miss a way to pass `ref` arg)
 
     apt-get install wazo-plugind-cli
     wazo-plugind-cli -c "install git https://github.com/ecole-hexagone/wazo-plugin-hubspot"

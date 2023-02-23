@@ -1,6 +1,6 @@
 name: hubspot-integration
 namespace: ecolehexagone
-version: 0.0.1a0
+version: 0.0.1a1
 author: École Hexagone
 display_name: Hubspot integration
 plugin_format_version: 1
