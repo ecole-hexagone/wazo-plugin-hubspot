@@ -12,8 +12,9 @@ Works only with **Wazo >= 20.11**
 ### Roadmap
 
 - [x] CRM integration in dird (search, lookup, favorites)
+    - [ ] Parse phone numbers based on contact / company country (local-based numbers entries)
 
-May need to move from private app to marketplace app:
+A move from private app to marketplace app will be needed for these features:
 
 - [ ] CTI from CRM interface (https://github.com/HubSpot/calling-extensions-sdk)
 - [ ] WebRTC integration in CRM interface
