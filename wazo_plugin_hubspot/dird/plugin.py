@@ -134,7 +134,7 @@ class HubspotBackend(BaseSourcePlugin):
                     "filters": [
                         {
                             "value": "*" + term + "*",
-                            "propertyName": "hs_searchable_calculated_mobile_number",
+                            "propertyName": "hs_searchable_calculated_phone_number",
                             "operator": "CONTAINS_TOKEN"
                         }
                     ]
