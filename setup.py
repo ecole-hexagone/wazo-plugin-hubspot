@@ -8,7 +8,7 @@ from setuptools import find_packages
 
 setup(
     name='wazo_plugin_hubspot',
-    version='0.0.1',
+    version='0.0.2',
     description='Wazo plugin to bring closer Hubspot and Wazo',
     author='École Hexagone',
     author_email='is.hq@ecole-hexagone.com',
