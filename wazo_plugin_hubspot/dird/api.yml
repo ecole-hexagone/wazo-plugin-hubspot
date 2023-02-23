@@ -1,0 +1,125 @@
+paths:
+  /backends/hubspot/sources:
+    get:
+      operationId: list_hubspot_source
+      summary: Get Hubspot configuration
+      description: '**Required ACL:** `dird.backends.hubspot.sources.read`'
+      tags:
+        - configuration
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/Limit'
+        - $ref: '#/parameters/Offset'
+      responses:
+        '200':
+          description: Configured hubspot source
+          schema:
+            $ref: '#/definitions/HubspotSourceItems'
+    post:
+      operationId: create_hubspot_source
+      summary: Configure a source for the hubspot backend
+      description: '**Required ACL:** `dird.backends.hubspot.sources.create`'
+      tags:
+        - configuration
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - in: body
+          name: body
+          description: The display configuration body
+          required: true
+          schema:
+            $ref: '#/definitions/HubspotSource'
+      responses:
+        '201':
+          description: The created display
+          schema:
+            $ref: '#/definitions/HubspotSource'
+          examples:
+            application/json:
+              format_columns:
+                name: '{firstname} {lastname}'
+                display_name: '{firstname} {lastname}'
+                phone_mobile: '{mobile}'
+                reverse: '{firstname} {lastname}'
+              name: hubspot
+              searched_columns: ["displayName", "phone_mobile"]
+              first_matched_columns: ["phone", "phone_mobile"]
+        '400':
+          $ref: '#/responses/CreateError'
+        '409':
+          description: Source already exists
+          schema:
+            $ref: '#/definitions/Error'
+  /backends/hubspot/sources/{source_uuid}:
+    get:
+      operationId: get_a_hubspot_source
+      summary: Get a `hubspot` source configuration
+      description: '**Required ACL:** `dird.backends.hubspot.sources.{source_uuid}.read`'
+      tags:
+        - configuration
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sourceuuid'
+      responses:
+        '200':
+          description: The `hubspot` source
+          schema:
+            $ref: '#/definitions/HubspotSource'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_hubspot_source
+      summary: Update a `hubspot` source configuration
+      description: '**Required ACL:** `dird.backends.hubspot.sources.{source_uuid}.update`'
+      tags:
+        - configuration
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sourceuuid'
+        - name: body
+          in: body
+          description: The source configuration body
+          required: true
+          schema:
+            $ref: '#/definitions/HubspotSource'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+        '409':
+          description: Duplicate Source
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      operationId: delete_hubspot_source
+      summary: Delete a `hubspot` source configuration
+      description: '**Required ACL:** `dird.backends.hubspot.sources.{source_uuid}.delete`'
+      tags:
+        - configuration
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sourceuuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  HubspotSource:
+    title: HubspotSource
+    allOf:
+      - $ref: '#/definitions/Source'
+      - properties:
+          access_token:
+            description: Hubspot private app access token 
+            example: "****"
+            default: ""
+            type: string
+      - required:
+        - access_token

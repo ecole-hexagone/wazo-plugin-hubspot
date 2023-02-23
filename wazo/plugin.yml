@@ -1,0 +1,13 @@
+name: hubspot-integration
+namespace: ecolehexagone
+version: 0.0.1a0
+author: École Hexagone
+display_name: Hubspot integration
+plugin_format_version: 1
+min_wazo_version: 20.10
+tags:
+  - community
+  - contact
+homepage: https://github.com/ecole-hexagone/wazo-plugin-hubspot
+debian_depends:
+  - python3-phonenumbers

@@ -1,0 +1,34 @@
+#!/bin/sh
+# Copyright 2023 École Hexagone (see the AUTHORS file)
+# SPDX-License-Identifier: GPLv3
+
+case "$1" in
+    build)
+	python3 setup.py bdist
+    ;;
+
+    package)
+	tar xvf dist/wazo_plugin_hubspot-*.tar.gz -C ${pkgdir}
+        cp -R etc ${pkgdir}/
+    ;;
+
+    install)
+	systemctl restart wazo-dird
+	systemctl restart wazo-ui
+    ;;
+
+    uninstall)
+	rm -f /etc/wazo-dird/conf.d/hubspot.yml
+	systemctl restart wazo-dird || true
+	rm -f /etc/wazo-ui/conf.d/hubpsot.yml
+	systemctl restart wazo-ui || true
+    ;;
+
+    postrm)
+    ;;
+
+    *)
+        echo "$0 called with unknown argument '$1'" >&2
+        exit 1
+    ;;
+esac

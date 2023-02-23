@@ -1,0 +1,5 @@
+enabled_plugins:
+  backends:
+    hubspot: true
+  views:
+    hubspot_backend: true
