@@ -13,13 +13,16 @@ Works only with **Wazo >= 20.11**
 
 - [x] CRM integration in dird (search, lookup, favorites)
     - [ ] Parse phone numbers based on contact / company country (local-based numbers entries)
+    - [ ] Cache results to optimize API quota usage
 
-A move from private app to marketplace app will be needed for these features:
+A move from private app to marketplace app will be needed for these features and Calling Extension SDK:
 
-- [ ] CTI from CRM interface (https://github.com/HubSpot/calling-extensions-sdk)
+- [ ] CTI from CRM interface
 - [ ] WebRTC integration in CRM interface
 - [ ] Call events in object timeline
 - [ ] Call records in object timeline
+
+More about Hubspot's Calling Extension SDK: https://github.com/HubSpot/calling-extensions-sdk
 
 ## How to install
 
