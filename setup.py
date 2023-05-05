@@ -15,7 +15,7 @@ setup(
     url='https://github.com/ecole-hexagone/wazo-plugin-hubspot',
     
     install_requires=[
-        'hubspot-api-client==7.4.0',
+        'hubspot-api-client>=7.4.0,<8',
     ],
     packages=find_packages(),
     include_package_data=True,
