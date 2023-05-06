@@ -29,12 +29,30 @@ class HubspotView(BaseBackendView):
 class HubspotBackend(BaseSourcePlugin):
 
     HUBSPOT_FIELD_ID = 'hs_object_id'
-    HUBSPOT_FIELD_FIRSTNAME = 'firstname' ## contact only
-    HUBSPOT_FIELD_LASTNAME = 'lastname' ## contact only
-    HUBSPOT_FIELD_NAME = 'name' ## company only
+    HUBSPOT_FIELD_FIRSTNAME = 'firstname'
+    HUBSPOT_FIELD_LASTNAME = 'lastname'
+    HUBSPOT_FIELD_NAME = 'name'
     HUBSPOT_FIELD_PHONE = 'phone'
-    HUBSPOT_FIELD_MOBILE = 'mobilephone' ## contact only
-    HUBSPOT_FIELD_EMAIL = 'email' ## contact only
+    HUBSPOT_FIELD_MOBILE = 'mobilephone'
+    HUBSPOT_FIELD_EMAIL = 'email'
+    HUBSPOT_FIELD_COUNTRY = 'country'
+
+    HUBSPOT_CONTACT_FIELDS = [
+        HUBSPOT_FIELD_ID,
+        HUBSPOT_FIELD_FIRSTNAME,
+        HUBSPOT_FIELD_LASTNAME,
+        HUBSPOT_FIELD_PHONE,
+        HUBSPOT_FIELD_MOBILE,
+        HUBSPOT_FIELD_EMAIL,
+        HUBSPOT_FIELD_COUNTRY,
+    ]
+
+    HUBSPOT_COMPANY_FIELDS = [
+        HUBSPOT_FIELD_ID,
+        HUBSPOT_FIELD_NAME,
+        HUBSPOT_FIELD_PHONE,
+        HUBSPOT_FIELD_COUNTRY,
+    ]
 
     def load(self, dependencies):
         """
@@ -130,33 +148,26 @@ class HubspotBackend(BaseSourcePlugin):
                         }
                     ]
                 },
-                {
-                    "filters": [
-                        {
-                            "value": "*" + term + "*",
-                            "propertyName": "hs_searchable_calculated_phone_number",
-                            "operator": "CONTAINS_TOKEN"
-                        }
-                    ]
-                },
-                {
-                    "filters": [
-                        {
-                            "value": "*" + term + "*",
-                            "propertyName": "hs_searchable_calculated_mobile_number",
-                            "operator": "CONTAINS_TOKEN"
-                        }
-                    ]
-                },
+                # {
+                #     "filters": [
+                #         {
+                #             "value": "*" + term + "*",
+                #             "propertyName": "hs_searchable_calculated_phone_number",
+                #             "operator": "CONTAINS_TOKEN"
+                #         }
+                #     ]
+                # },
+                # {
+                #     "filters": [
+                #         {
+                #             "value": "*" + term + "*",
+                #             "propertyName": "hs_searchable_calculated_mobile_number",
+                #             "operator": "CONTAINS_TOKEN"
+                #         }
+                #     ]
+                # },
             ],
-            properties=[
-                self.HUBSPOT_FIELD_ID,
-                self.HUBSPOT_FIELD_FIRSTNAME,
-                self.HUBSPOT_FIELD_LASTNAME,
-                self.HUBSPOT_FIELD_PHONE,
-                self.HUBSPOT_FIELD_MOBILE,
-                self.HUBSPOT_FIELD_EMAIL,
-            ],
+            properties=self.HUBSPOT_CONTACT_FIELDS,
             limit=10
         )
 
@@ -190,28 +201,28 @@ class HubspotBackend(BaseSourcePlugin):
                 #     ]
                 # },
             ],
-            properties=[
-                self.HUBSPOT_FIELD_ID,
-                self.HUBSPOT_FIELD_NAME,
-                self.HUBSPOT_FIELD_PHONE,
-            ],
+            properties=self.HUBSPOT_COMPANY_FIELDS,
             limit=10
         )
 
-        ## needs scope : crm.objects.contacts.read
         try:
-            contacts_res = self.api_client.crm.contacts.search_api.do_search(public_object_search_request=contact_public_object_search_request)
+            contacts_res = self.api_client.crm.contacts.search_api.do_search(
+                public_object_search_request=contact_public_object_search_request
+            )
         except ApiException as e:
             logger.error("Exception when calling search_api->do_search: %s\n" % e)
 
-        ## needs scope : crm.objects.companies.read
         try:
-            companies_res = self.api_client.crm.companies.search_api.do_search(public_object_search_request=company_public_object_search_request)
+            companies_res = self.api_client.crm.companies.search_api.do_search(
+                public_object_search_request=company_public_object_search_request
+            )
         except ApiException as e:
             logger.error("Exception when calling search_api->do_search: %s\n" % e)
 
-        return chain((self._source_result_from_content(contact) for contact in contacts_res.results),
-            (self._source_result_from_content(company) for company in companies_res.results))
+        return chain(
+            (self._source_result_from_content(contact) for contact in contacts_res.results),
+            (self._source_result_from_content(company) for company in companies_res.results),
+        )
 
     def first_match(self, term, args=None):
         """
@@ -251,24 +262,6 @@ class HubspotBackend(BaseSourcePlugin):
                 #     "filters": [
                 #         {
                 #             "value": intnum,
-                #             "propertyName": "hs_searchable_calculated_international_phone_number",
-                #             "operator": "EQ"
-                #         }
-                #     ]
-                # },
-                # {
-                #     "filters": [
-                #         {
-                #             "value": intnum,
-                #             "propertyName": "hs_searchable_calculated_international_mobile_number",
-                #             "operator": "EQ"
-                #         }
-                #     ]
-                # },
-                # {
-                #     "filters": [
-                #         {
-                #             "value": intnum,
                 #             "propertyName": "hs_searchable_calculated_phone_number",
                 #             "operator": "EQ"
                 #         }
@@ -284,14 +277,7 @@ class HubspotBackend(BaseSourcePlugin):
                 #     ]
                 # },
             ],
-            properties=[
-                self.HUBSPOT_FIELD_ID,
-                self.HUBSPOT_FIELD_FIRSTNAME,
-                self.HUBSPOT_FIELD_LASTNAME,
-                self.HUBSPOT_FIELD_PHONE,
-                self.HUBSPOT_FIELD_MOBILE,
-                self.HUBSPOT_FIELD_EMAIL,
-            ],
+            properties=self.HUBSPOT_CONTACT_FIELDS,
             limit=1
         )
 
@@ -306,33 +292,6 @@ class HubspotBackend(BaseSourcePlugin):
                         }
                     ]
                 },
-                {
-                    "filters": [
-                        {
-                            "value": intnum,
-                            "propertyName": self.HUBSPOT_FIELD_MOBILE,
-                            "operator": "EQ"
-                        }
-                    ]
-                },
-                # {
-                #     "filters": [
-                #         {
-                #             "value": intnum,
-                #             "propertyName": "hs_searchable_calculated_international_phone_number",
-                #             "operator": "EQ"
-                #         }
-                #     ]
-                # },
-                # {
-                #     "filters": [
-                #         {
-                #             "value": intnum,
-                #             "propertyName": "hs_searchable_calculated_international_mobile_number",
-                #             "operator": "EQ"
-                #         }
-                #     ]
-                # },
                 # {
                 #     "filters": [
                 #         {
@@ -342,38 +301,29 @@ class HubspotBackend(BaseSourcePlugin):
                 #         }
                 #     ]
                 # },
-                # {
-                #     "filters": [
-                #         {
-                #             "value": intnum,
-                #             "propertyName": "hs_searchable_calculated_mobile_number",
-                #             "operator": "EQ"
-                #         },
-                #     ]
-                # },
             ],
-            properties=[
-                self.HUBSPOT_FIELD_ID,
-                self.HUBSPOT_FIELD_NAME,
-                self.HUBSPOT_FIELD_PHONE,
-            ],
+            properties=self.HUBSPOT_COMPANY_FIELDS,
             limit=1
         )
 
-        ## needs scope : crm.objects.contacts.read
         try:
-            contacts_res =  self.api_client.crm.contacts.search_api.do_search(public_object_search_request=contact_public_object_search_request)
+            contacts_res =  self.api_client.crm.contacts.search_api.do_search(
+                public_object_search_request=contact_public_object_search_request
+            )
         except ApiException as e:
             logger.error("Exception when calling search_api->do_search: %s\n" % e)
 
-        ## needs scope : crm.objects.companies.read
         try:
-            companies_res =  self.api_client.crm.companies.search_api.do_search(public_object_search_request=company_public_object_search_request)
+            companies_res =  self.api_client.crm.companies.search_api.do_search(
+                public_object_search_request=company_public_object_search_request
+            )
         except ApiException as e:
             logger.error("Exception when calling search_api->do_search: %s\n" % e)
         
-        results = chain((self._source_result_from_content(contact) for contact in contacts_res.results),
-            (self._source_result_from_content(company) for company in companies_res.results))
+        results = chain(
+            (self._source_result_from_content(contact) for contact in contacts_res.results),
+            (self._source_result_from_content(company) for company in companies_res.results),
+        )
 
         return results[0] if 0 < len(results) else None
 
@@ -400,14 +350,7 @@ class HubspotBackend(BaseSourcePlugin):
                     ]
                 },
             ],
-            properties=[
-                self.HUBSPOT_FIELD_ID,
-                self.HUBSPOT_FIELD_FIRSTNAME,
-                self.HUBSPOT_FIELD_LASTNAME,
-                self.HUBSPOT_FIELD_PHONE,
-                self.HUBSPOT_FIELD_MOBILE,
-                self.HUBSPOT_FIELD_EMAIL,
-            ],
+            properties=self.HUBSPOT_CONTACT_FIELDS,
         )
 
         company_public_object_search_request = PublicObjectSearchRequest(
@@ -422,27 +365,27 @@ class HubspotBackend(BaseSourcePlugin):
                     ]
                 },
             ],
-            properties=[
-                self.HUBSPOT_FIELD_ID,
-                self.HUBSPOT_FIELD_NAME,
-                self.HUBSPOT_FIELD_PHONE,
-            ],
+            properties=self.HUBSPOT_COMPANY_FIELDS,
         )
 
-        ## needs scope : crm.objects.contacts.read
         try:
-            contacts_res =  self.api_client.crm.contacts.search_api.do_search(public_object_search_request=contact_public_object_search_request)
+            contacts_res =  self.api_client.crm.contacts.search_api.do_search(
+                public_object_search_request=contact_public_object_search_request
+            )
         except ApiException as e:
             logger.error("Exception when calling search_api->do_search: %s\n" % e)
 
-        ## needs scope : crm.objects.companies.read
         try:
-            companies_res =  self.api_client.crm.companies.search_api.do_search(public_object_search_request=company_public_object_search_request)
+            companies_res =  self.api_client.crm.companies.search_api.do_search(
+                public_object_search_request=company_public_object_search_request
+            )
         except ApiException as e:
             logger.error("Exception when calling search_api->do_search: %s\n" % e)
         
-        return chain((self._source_result_from_content(contact) for contact in contacts_res.results), 
-           (self._source_result_from_content(company) for company in companies_res.results))
+        return chain(
+            (self._source_result_from_content(contact) for contact in contacts_res.results), 
+            (self._source_result_from_content(company) for company in companies_res.results),
+        )
 
     def _source_result_from_content(self, content):
         try:
