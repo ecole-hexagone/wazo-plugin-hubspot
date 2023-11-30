@@ -14,7 +14,8 @@ case "$1" in
 
     install)
 	systemctl restart wazo-dird
-	systemctl restart wazo-ui
+    ## Ignore Wazo UI service restart failure, 
+	systemctl restart wazo-ui || true
     ;;
 
     uninstall)

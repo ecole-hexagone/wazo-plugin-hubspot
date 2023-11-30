@@ -8,12 +8,12 @@ from setuptools import find_packages
 
 setup(
     name='wazo_plugin_hubspot',
-    version='0.0.2',
+    version='0.0.3',
     description='Wazo plugin to bring closer Hubspot and Wazo',
     author='École Hexagone',
     author_email='is.hq@ecole-hexagone.com',
     url='https://github.com/ecole-hexagone/wazo-plugin-hubspot',
-    
+
     install_requires=[
         'hubspot-api-client>=7.4.0,<8',
     ],
